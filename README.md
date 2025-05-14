@@ -20,6 +20,7 @@ The Job Application Tracker & Tailoring Assistant is a modern, browser-based too
 - **Boosts application quality**: AI suggestions help users tailor materials to each job.
 - **Prepares users for interviews**: Company research tools and reminders for follow-ups.
 - **Flexible AI integration**: Supports both local (Ollama) and cloud (Google Gemini) LLMs.
+- **Company Research by Tavily AI: Supports company research provided by Tavily AI and refined by Google Gemini (2.0 flash).
 
 ### Typical User Flow
 1. Add job applications via the Kanban board.
