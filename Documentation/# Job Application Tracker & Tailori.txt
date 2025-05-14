@@ -1,0 +1,151 @@
+# Job Application Tracker & Tailoring Assistant
+
+## 1. Overview
+
+The Job Application Tracker & Tailoring Assistant is a web-based application designed to help users manage their job applications efficiently and enhance their application materials using AI-powered suggestions. It provides a visual Kanban board for tracking application stages, a "Dashboard" for a high-level overview and upcoming tasks, a dedicated "Tailoring Studio" for refining resumes and cover letters against job descriptions, and a section for company research.
+
+**Target Audience (for this README):** Product Managers, Software Engineers.
+
+## 2. Key Features (Current State)
+
+* **Dashboard Page:**
+    * **Application Funnel / Pipeline Overview:** Displays "stat cards" showing the total number of active applications and counts for key stages (To Apply, Applied, Follow-Up, Interview).
+    * **Upcoming Deadlines & Follow-ups:** Lists upcoming follow-up actions, sorted by date, highlighting overdue and today's items.
+* **Kanban Board:**
+    * Visually track job applications through stages: "To Apply," "Applied," "Follow-Up," "Interview," "Rejected," "Offer."
+    * Drag-and-drop functionality to move applications between stages.
+    * Add and edit job application details: Job Title, Company, Job Description Link, Resume Link, Cover Letter Link, Application Date, Follow-Up Date, Current Status, and Notes.
+    * Search bar to filter applications by Job Title or Company Name.
+* **Collapsible Sidebar Navigation:**
+    * Easy navigation between different sections of the application (Dashboard, Kanban Board, Tailoring Studio, Settings, etc.).
+    * Sidebar can be collapsed to maximize content viewing area.
+* **Tailoring Studio Page:**
+    * **Job Selection:** Dropdown to select an existing job application to work on.
+    * **Input Fields:** Dedicated text areas for pasting:
+        * Job Description
+        * User's Resume (with optional tag for versioning)
+        * User's Cover Letter (with optional tag for versioning)
+    * **AI-Powered Tailoring Suggestions:**
+        * "Generate Tailoring Suggestions" button.
+        * Integrates with LLMs to provide feedback on how to align the resume and cover letter with the job description.
+        * Displays suggestions in a dedicated output area.
+    * **Company Research:**
+        * Text area for users to input their company research notes.
+        * "Generate Sample Research" button to populate the area with a placeholder research template (currently static).
+* **Settings Page:**
+    * **LLM Configuration:**
+        * Allows users to select their preferred LLM provider for tailoring suggestions:
+            * Local Ollama (default, e.g., using Llama3 model)
+            * Google Gemini API
+        * Input fields for Ollama API endpoint and model name.
+        * Input field for Google Gemini API Key.
+        * Configuration is saved to `localStorage`.
+* **Data Persistence:**
+    * All job application data, LLM settings, and sidebar state are currently persisted in the browser's `localStorage`.
+
+## 3. Technical Stack (Current State - Frontend Only)
+
+* **HTML5:** Structure of the web application.
+* **Tailwind CSS:** Utility-first CSS framework for styling and responsive design.
+* **JavaScript (ES6+):** Core logic for:
+    * DOM manipulation and UI updates.
+    * Event handling (drag & drop, button clicks, form submissions).
+    * Managing application state (job data, settings).
+    * Client-side routing/page switching.
+    * API calls to LLMs (`fetch` API).
+    * `localStorage` interaction for data persistence.
+* **Font Awesome:** For icons.
+
+## 4. How it Works
+
+### 4.1 Product Manager Perspective
+
+* **User Flow:**
+    1.  Users land on the application, with the Kanban board typically as the initial view (or they can navigate to the Dashboard).
+    2.  The **Dashboard** provides an at-a-glance view of their application pipeline (counts per stage) and upcoming follow-ups.
+    3.  On the **Kanban board**, they can add new job applications or view existing ones.
+    4.  They can update application details or drag cards to different stages as their application progresses.
+    5.  To optimize an application, users navigate to the **"Tailoring Studio."**
+    6.  In the Studio, they select a job, paste the job description, their resume, and optionally a cover letter.
+    7.  Clicking "Generate Tailoring Suggestions" sends this data (via the configured LLM provider in Settings) to an LLM, and feedback is displayed.
+    8.  Users can also add company research notes or generate a sample template.
+    9.  LLM preferences (Ollama or Gemini, API keys/endpoints) are managed on the **"Settings" page.**
+* **Value Proposition:**
+    * Provides a centralized and organized system for job application management with quick insights via the Dashboard.
+    * Empowers users to create highly tailored and effective application materials by leveraging AI.
+    * Facilitates company-specific research and preparation.
+    * Helps users stay on top of important deadlines and follow-ups.
+
+### 4.2 Senior Engineer Perspective
+
+* **Architecture:**
+    * The application functions as a single-page application (SPA), with page/view switching managed by JavaScript (hiding/showing relevant `div` sections).
+    * The UI is dynamically rendered and updated using JavaScript DOM manipulation.
+    * It follows an event-driven model for user interactions.
+* **Data Management:**
+    * Job applications and settings are stored as JavaScript objects and arrays.
+    * These are serialized to JSON and stored in `localStorage`. `loadJobsFromLocalStorage()` and `saveJobsToLocalStorage()` (and similar for settings) handle persistence.
+    * This is a client-side only solution and has limitations (single browser, no backup, storage limits).
+* **LLM Interaction:**
+    * The `handleStudioGenerateFeedback()` function orchestrates LLM calls.
+    * It constructs a prompt based on user inputs (JD, resume, cover letter).
+    * Uses the `fetch` API to make HTTP POST requests to either:
+        * A local Ollama API endpoint (e.g., `http://localhost:11434/api/generate`) with a JSON payload including the model and prompt.
+        * The Google Gemini API endpoint, including the API key and a structured JSON payload.
+    * Responses are parsed (expected to be text or simple JSON containing text) and displayed.
+    * Error handling is basic, displaying messages in the output area.
+* **Key JavaScript Modules/Functions (Conceptual):**
+    * `initializeApp()`: Sets up initial state, loads data, renders UI.
+    * `switchPage()`: Handles navigation between views.
+    * `renderDashboardPage()`: Renders the entire dashboard content.
+        * `renderDashboardPipelineOverview()`: Calculates and displays pipeline stats.
+        * `renderDashboardFollowUps()`: Calculates and displays upcoming follow-ups.
+    * `renderKanbanBoard()`: Renders the Kanban board and its cards, including search filtering.
+    * `createJobCardElement()`: Creates the HTML for an individual job card.
+    * `openJobModal()`, `closeJobModal()`: Manage the add/edit job application modal.
+    * `handleJobFormSubmit()`: Processes new/edited job data.
+    * Drag-and-drop handlers (`handleDragStart`, `handleDrop`, etc.).
+    * Tailoring Studio functions (`populateJobSelectDropdown`, `handleJobSelectionChange`, `handleStudioGenerateFeedback`, `handleStudioGenerateResearch`).
+    * LLM configuration functions (`loadLlmConfig`, `saveLlmConfig`, `updateLlmConfigUI`).
+
+## 5. Setup & Running (Current State)
+
+1.  Save the complete HTML code as an `.html` file (e.g., `job_tracker.html`).
+2.  Open this file in a modern web browser (Chrome, Firefox, Edge, Safari).
+3.  **For LLM-powered Tailoring Suggestions:**
+    * Navigate to the "Settings" page within the application.
+    * **If using Local Ollama (default):**
+        * Ensure Ollama is installed and running on your local machine.
+        * Pull the desired model (e.g., `ollama pull llama3`).
+        * Verify the "Ollama API Endpoint" (default: `http://localhost:11434/api/generate`) and "Ollama Model Name" (default: `llama3`) in the settings are correct for your local setup.
+    * **If using Google Gemini API:**
+        * Select "Google Gemini API" as the provider.
+        * Obtain an API key from Google AI Studio (Google Cloud).
+        * Enter the API key into the designated field in the settings.
+    * Click "Save LLM Configuration."
+
+## 6. Future Considerations / Next Steps
+
+* **Backend Integration:** Transition from `localStorage` to a robust backend solution (e.g., Supabase, or a custom Node.js/Python backend with PostgreSQL/MongoDB) for:
+    * Persistent and secure data storage.
+    * User accounts and authentication.
+    * Data synchronization across devices.
+* **Enhanced LLM Features:**
+    * Streaming responses from LLMs for better UX.
+    * More sophisticated prompt engineering for nuanced feedback.
+    * LLM-powered generation of initial cover letter drafts.
+    * LLM-powered company research summary generation (replacing static sample).
+* **Dashboard & Analytics:**
+    * Implement the "Analytics" page.
+    * Add more advanced metrics to the Dashboard (e.g., interview rate, offer rate, time in stage).
+* **File Uploads:** Allow direct resume/cover letter file uploads instead of just links.
+* **Improved Error Handling & User Feedback:** More sophisticated notifications and error management.
+* **Testing:** Implementation of unit and end-to-end tests.
+
+## 7. Code Structure Notes
+
+* The application is contained within a single HTML file.
+* CSS styling is primarily handled by Tailwind CSS classes, with some custom styles in a `<style>` block.
+* All JavaScript logic is within a single `<script>` block at the end of the body.
+* JavaScript is organized into functions for different features and responsibilities.
+* Global variables are used for application state and DOM element references. Consider refactoring to a more structured state management approach (e.g., objects, or a simple store pattern) if complexity grows significantly before a full backend refactor.
