@@ -445,8 +445,12 @@
                 </div>
                 <div class="studio-section">
                     <div class="field-header">
-                         <label for="studioResumeInput">Your Resume</label>
-                         <button type="button" class="btn-clear" onclick="document.getElementById('studioResumeInput').value=''">Clear</button>
+                        <label for="studioResumeInput">Your Resume</label>
+                        <button type="button" class="btn-clear" onclick="document.getElementById('studioResumeInput').value=''">Clear</button>
+                    </div>
+                    <div class="flex flex-col md:flex-row md:items-center mb-2 gap-2">
+                        <select id="resumeTemplateDropdown" class="modal-input md:w-1/2" style="max-width:320px;"><option value="">Insert from Template...</option></select>
+                        <button id="saveResumeAsTemplateBtn" class="btn-secondary md:w-auto"><i class="fas fa-save mr-1"></i>Save as Template</button>
                     </div>
                     <textarea id="studioResumeInput" class="w-full studio-textarea" placeholder="Paste your relevant resume section or full resume..."></textarea>
                     <input type="text" id="studioResumeTagInput" class="modal-input mt-2 text-sm" placeholder="Optional: Resume Version/Tag">
@@ -455,6 +459,10 @@
                     <div class="field-header">
                         <label for="studioCoverLetterInput">Your Cover Letter</label>
                         <button type="button" class="btn-clear" onclick="document.getElementById('studioCoverLetterInput').value=''">Clear</button>
+                    </div>
+                    <div class="flex flex-col md:flex-row md:items-center mb-2 gap-2">
+                        <select id="coverLetterTemplateDropdown" class="modal-input md:w-1/2" style="max-width:320px;"><option value="">Insert from Template...</option></select>
+                        <button id="saveCoverLetterAsTemplateBtn" class="btn-secondary md:w-auto"><i class="fas fa-save mr-1"></i>Save as Template</button>
                     </div>
                     <textarea id="studioCoverLetterInput" class="w-full studio-textarea" placeholder="Paste your cover letter draft..."></textarea>
                     <input type="text" id="studioCoverLetterTagInput" class="modal-input mt-2 text-sm" placeholder="Optional: Cover Letter Version/Tag">
@@ -475,8 +483,9 @@
                     </div>
                     <textarea id="studioCompanyResearchInput" class="w-full studio-textarea" placeholder="Add your company research notes here..."></textarea>
                     <div class="my-4 text-center">
-                        <button id="studioGenerateResearchBtn" class="btn-secondary py-2 px-4">
-                            <i class="fas fa-file-alt mr-2"></i>Generate Sample Research
+                        <button id="studioGenerateResearchBtn" class="btn-primary py-3 px-6 text-lg">
+                            <i class="fas fa-building mr-2"></i>
+                            <span id="generateResearchBtnText">Generate Company Research</span>
                         </button>
                     </div>
                     <div id="studioResearchOutputContainer" class="research-output-container hidden">
@@ -585,6 +594,14 @@
                  <button id="saveLlmConfigBtn" class="btn-secondary mt-6 py-2 px-4 text-base">Save LLM Configuration</button>
             </div>
             <div class="settings-section">
+                <h3 class="text-xl font-semibold mb-4 text-gray-100 border-b border-gray-600 pb-2">My Resume Templates</h3>
+                <button id="addResumeTemplateBtn" class="btn-secondary mb-4"><i class="fas fa-plus mr-1"></i>Add Resume Template</button>
+                <ul id="resumeTemplatesList" class="mb-6"></ul>
+                <h3 class="text-xl font-semibold mb-4 text-gray-100 border-b border-gray-600 pb-2">My Cover Letter Templates</h3>
+                <button id="addCoverLetterTemplateBtn" class="btn-secondary mb-4"><i class="fas fa-plus mr-1"></i>Add Cover Letter Template</button>
+                <ul id="coverLetterTemplatesList"></ul>
+            </div>
+            <div class="settings-section">
                  <h3 class="text-xl font-semibold mb-4 text-gray-100 border-b border-gray-600 pb-2">Application Preferences</h3>
                  <p class="text-gray-400">More settings coming soon...</p>
             </div>
@@ -608,6 +625,29 @@
                 <div class="mb-4"> <label for="status" class="block text-sm font-medium mb-1">Status</label> <select id="status" class="modal-select"> </select> </div>
                 <div class="mb-6"> <label for="notes" class="block text-sm font-medium mb-1">Notes</label> <textarea id="notes" rows="4" class="modal-textarea"></textarea> </div>
                 <div class="flex justify-end space-x-3"> <button type="button" id="cancelBtn" class="btn-secondary">Cancel</button> <button type="submit" class="btn-primary">Save Job</button> </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Template Modal (shared for add/edit resume or cover letter template) -->
+    <div id="templateModal" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal">
+        <div class="modal-content p-6 rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <h2 id="templateModalTitle" class="text-2xl font-semibold mb-6">Add Template</h2>
+            <form id="templateForm">
+                <input type="hidden" id="templateType"> <!-- 'resume' or 'coverLetter' -->
+                <input type="hidden" id="templateId"> <!-- for editing -->
+                <div class="mb-4">
+                    <label for="templateNameInput" class="block text-sm font-medium mb-1">Template Name</label>
+                    <input type="text" id="templateNameInput" class="modal-input" required>
+                </div>
+                <div class="mb-6">
+                    <label for="templateContentInput" class="block text-sm font-medium mb-1">Content</label>
+                    <textarea id="templateContentInput" class="modal-textarea" rows="8" required></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancelTemplateBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Template</button>
+                </div>
             </form>
         </div>
     </div>
@@ -685,6 +725,15 @@
         const tavilyExtractDebug = document.getElementById('tavilyExtractDebug');
         const geminiPromptDebug = document.getElementById('geminiPromptDebug');
         const geminiResponseDebug = document.getElementById('geminiResponseDebug');
+        const addResumeTemplateBtn = document.getElementById('addResumeTemplateBtn');
+        const resumeTemplatesList = document.getElementById('resumeTemplatesList');
+        const addCoverLetterTemplateBtn = document.getElementById('addCoverLetterTemplateBtn');
+        const coverLetterTemplatesList = document.getElementById('coverLetterTemplatesList');
+        const resumeTemplateDropdown = document.getElementById('resumeTemplateDropdown');
+        const coverLetterTemplateDropdown = document.getElementById('coverLetterTemplateDropdown');
+        const saveResumeAsTemplateBtn = document.getElementById('saveResumeAsTemplateBtn');
+        const saveCoverLetterAsTemplateBtn = document.getElementById('saveCoverLetterAsTemplateBtn');
+        const cancelTemplateBtn = document.getElementById('cancelTemplateBtn');
 
         // --- Utility Functions ---
         const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
@@ -1322,6 +1371,13 @@ If information is missing, say so in the relevant section.`;
                 researchDebugContainer.style.display = researchDebugContainer.style.display === 'none' ? '' : 'none';
             });
         }
+        if (addResumeTemplateBtn) addResumeTemplateBtn.addEventListener('click', () => openTemplateModal('resume'));
+        if (addCoverLetterTemplateBtn) addCoverLetterTemplateBtn.addEventListener('click', () => openTemplateModal('coverLetter'));
+        if (resumeTemplateDropdown) resumeTemplateDropdown.addEventListener('change', (e) => loadTemplateContent(e.target.value, 'resume'));
+        if (coverLetterTemplateDropdown) coverLetterTemplateDropdown.addEventListener('change', (e) => loadTemplateContent(e.target.value, 'coverLetter'));
+        if (saveResumeAsTemplateBtn) saveResumeAsTemplateBtn.addEventListener('click', () => saveTemplate('resume'));
+        if (saveCoverLetterAsTemplateBtn) saveCoverLetterAsTemplateBtn.addEventListener('click', () => saveTemplate('coverLetter'));
+        if (cancelTemplateBtn) cancelTemplateBtn.addEventListener('click', closeTemplateModal);
 
         window.addEventListener('resize', () => {
             if (window.innerWidth <= 768 && sidebar.classList.contains('collapsed')) {}
@@ -1364,6 +1420,235 @@ If information is missing, say so in the relevant section.`;
         document.addEventListener('DOMContentLoaded', function() {
             setInitialTheme();
             initializeApp();
+        });
+
+        // --- Template Modal ---
+        function openTemplateModal(templateType, template = null) {
+            // const form = document.getElementById('templateForm');
+            // form.reset(); // <-- Remove this line to preserve pre-filled content
+            document.getElementById('templateType').value = templateType;
+            document.getElementById('templateId').value = template && template.id ? template.id : '';
+            document.getElementById('templateNameInput').value = template && template.name ? template.name : '';
+            document.getElementById('templateContentInput').value = template && template.content ? template.content : '';
+            document.getElementById('templateModalTitle').textContent = (template ? 'Edit' : 'Add') + (templateType === 'resume' ? ' Resume Template' : ' Cover Letter Template');
+            document.getElementById('templateModal').classList.remove('hidden');
+            document.getElementById('templateModal').classList.add('flex');
+            setTimeout(() => { document.getElementById('templateNameInput').focus(); }, 100);
+        }
+        function closeTemplateModal() {
+            document.getElementById('templateModal').classList.add('hidden');
+            document.getElementById('templateModal').classList.remove('flex');
+        }
+        function saveTemplate(templateType) {
+            const templateName = document.getElementById('templateNameInput').value;
+            const templateContent = document.getElementById('templateContentInput').value;
+            if (!templateName || !templateContent) {
+                alert("Template name and content are required.");
+                return;
+            }
+            const templateId = document.getElementById('templateId').value;
+            const templateData = {
+                id: templateId,
+                name: templateName,
+                content: templateContent,
+                type: templateType
+            };
+            if (templateId) {
+                // Update existing template
+                const index = jobApplications.findIndex(t => t.id === templateId);
+                if (index !== -1) {
+                    jobApplications[index] = templateData;
+                } else {
+                    alert("Template not found.");
+                    return;
+                }
+            } else {
+                // Add new template
+                templateData.id = generateId();
+                jobApplications.push(templateData);
+            }
+            saveJobsToLocalStorage();
+            closeTemplateModal();
+            loadTemplates();
+        }
+        function loadTemplateContent(templateId, templateType) {
+            const template = jobApplications.find(t => t.id === templateId);
+            if (template) {
+                document.getElementById('templateNameInput').value = template.name;
+                document.getElementById('templateContentInput').value = template.content;
+                document.getElementById('templateId').value = template.id;
+                document.getElementById('templateType').value = templateType;
+                openTemplateModal(templateType);
+            }
+        }
+        function loadTemplates() {
+            resumeTemplatesList.innerHTML = '';
+            coverLetterTemplatesList.innerHTML = '';
+            jobApplications.forEach(template => {
+                const li = document.createElement('li');
+                li.textContent = template.name;
+                li.classList.add('cursor-pointer', 'py-2', 'px-4', 'hover:bg-gray-700');
+                li.onclick = () => loadTemplateContent(template.id, template.type);
+                if (template.type === 'resume') {
+                    resumeTemplatesList.appendChild(li);
+                } else if (template.type === 'coverLetter') {
+                    coverLetterTemplatesList.appendChild(li);
+                }
+            });
+        }
+
+        // --- Template Storage Helpers ---
+        function getTemplates(type) {
+            const key = type === 'resume' ? 'resumeTemplates' : 'coverLetterTemplates';
+            return JSON.parse(localStorage.getItem(key) || '[]');
+        }
+        function saveTemplates(type, arr) {
+            const key = type === 'resume' ? 'resumeTemplates' : 'coverLetterTemplates';
+            localStorage.setItem(key, JSON.stringify(arr));
+        }
+
+        // --- Template Modal Logic ---
+        function openTemplateModal(templateType, template = null) {
+            document.getElementById('templateType').value = templateType;
+            document.getElementById('templateId').value = template && template.id ? template.id : '';
+            document.getElementById('templateNameInput').value = template && template.name ? template.name : '';
+            document.getElementById('templateContentInput').value = template && template.content ? template.content : '';
+            document.getElementById('templateModalTitle').textContent = (template ? 'Edit' : 'Add') + (templateType === 'resume' ? ' Resume Template' : ' Cover Letter Template');
+            document.getElementById('templateModal').classList.remove('hidden');
+            document.getElementById('templateModal').classList.add('flex');
+        }
+        function closeTemplateModal() {
+            document.getElementById('templateModal').classList.add('hidden');
+            document.getElementById('templateModal').classList.remove('flex');
+            document.getElementById('templateForm').reset();
+        }
+
+        // --- Settings Page: List, Edit, Delete ---
+        function renderTemplateLists() {
+            // Resume
+            resumeTemplatesList.innerHTML = '';
+            const resumes = getTemplates('resume');
+            resumes.forEach(t => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between py-2 px-2 border-b border-gray-600';
+                li.innerHTML = `<span class="font-medium">${t.name}</span>` +
+                    `<span><button class="btn-secondary btn-xs mr-2" data-action="edit">Edit</button><button class="btn-secondary btn-xs" data-action="delete">Delete</button></span>`;
+                li.querySelector('[data-action="edit"]').onclick = () => openTemplateModal('resume', t);
+                li.querySelector('[data-action="delete"]').onclick = () => { if(confirm('Delete this template?')) { deleteTemplate('resume', t.id); } };
+                resumeTemplatesList.appendChild(li);
+            });
+            // Cover Letter
+            coverLetterTemplatesList.innerHTML = '';
+            const covers = getTemplates('coverLetter');
+            covers.forEach(t => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between py-2 px-2 border-b border-gray-600';
+                li.innerHTML = `<span class=\"font-medium\">${t.name}</span>` +
+                    `<span><button class=\"btn-secondary btn-xs mr-2\" data-action=\"edit\">Edit</button><button class=\"btn-secondary btn-xs\" data-action=\"delete\">Delete</button></span>`;
+                li.querySelector('[data-action="edit"]').onclick = () => openTemplateModal('coverLetter', t);
+                li.querySelector('[data-action="delete"]').onclick = () => { if(confirm('Delete this template?')) { deleteTemplate('coverLetter', t.id); } };
+                coverLetterTemplatesList.appendChild(li);
+            });
+        }
+        function deleteTemplate(type, id) {
+            let arr = getTemplates(type);
+            arr = arr.filter(t => t.id !== id);
+            saveTemplates(type, arr);
+            renderTemplateLists();
+            renderTemplateDropdowns();
+        }
+        // --- Modal Form Submission ---
+        document.getElementById('templateForm').onsubmit = function(e) {
+            e.preventDefault();
+            const type = document.getElementById('templateType').value;
+            const id = document.getElementById('templateId').value;
+            const name = document.getElementById('templateNameInput').value.trim();
+            const content = document.getElementById('templateContentInput').value.trim();
+            if(!name || !content) { alert('Name and content required.'); return; }
+            let arr = getTemplates(type);
+            if(id) {
+                // Edit
+                arr = arr.map(t => t.id === id ? { ...t, name, content } : t);
+            } else {
+                // Add
+                arr.push({ id: generateId(), name, content });
+            }
+            saveTemplates(type, arr);
+            closeTemplateModal();
+            renderTemplateLists();
+            renderTemplateDropdowns();
+        };
+        // --- Dropdowns in Tailoring Studio ---
+        function renderTemplateDropdowns() {
+            // Resume
+            if(resumeTemplateDropdown) {
+                const arr = getTemplates('resume');
+                resumeTemplateDropdown.innerHTML = '<option value="">Insert from Template...</option>' + arr.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+            }
+            // Cover Letter
+            if(coverLetterTemplateDropdown) {
+                const arr = getTemplates('coverLetter');
+                coverLetterTemplateDropdown.innerHTML = '<option value="">Insert from Template...</option>' + arr.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+            }
+        }
+        if(resumeTemplateDropdown) resumeTemplateDropdown.addEventListener('change', function() {
+            const id = this.value;
+            if(!id) return;
+            const t = getTemplates('resume').find(t => t.id === id);
+            if(t) studioResumeInput.value = t.content;
+            this.value = '';
+        });
+        if(coverLetterTemplateDropdown) coverLetterTemplateDropdown.addEventListener('change', function() {
+            const id = this.value;
+            if(!id) return;
+            const t = getTemplates('coverLetter').find(t => t.id === id);
+            if(t) studioCoverLetterInput.value = t.content;
+            this.value = '';
+        });
+        // --- Save as Template from Tailoring Studio ---
+        if(saveResumeAsTemplateBtn) saveResumeAsTemplateBtn.onclick = function(e) {
+            e.preventDefault && e.preventDefault();
+            if (!studioResumeInput.value.trim()) {
+                alert('Please enter your resume content before saving as a template.');
+                return;
+            }
+            openTemplateModal('resume', { name: '', content: studioResumeInput.value });
+        };
+        if(saveCoverLetterAsTemplateBtn) saveCoverLetterAsTemplateBtn.onclick = function(e) {
+            e.preventDefault && e.preventDefault();
+            if (!studioCoverLetterInput.value.trim()) {
+                alert('Please enter your cover letter content before saving as a template.');
+                return;
+            }
+            openTemplateModal('coverLetter', { name: '', content: studioCoverLetterInput.value });
+        };
+        // --- Add buttons in Settings ---
+        if(addResumeTemplateBtn) addResumeTemplateBtn.onclick = function() { openTemplateModal('resume'); };
+        if(addCoverLetterTemplateBtn) addCoverLetterTemplateBtn.onclick = function() { openTemplateModal('coverLetter'); };
+        // --- Modal Cancel ---
+        if(cancelTemplateBtn) cancelTemplateBtn.onclick = closeTemplateModal;
+        // --- Initial Render ---
+        renderTemplateLists();
+        renderTemplateDropdowns();
+
+        function updateGenerateResearchBtnLabel() {
+            const btnText = document.getElementById('generateResearchBtnText');
+            if (!btnText) return;
+            let company = '';
+            if (currentStudioJobId && jobApplications && jobApplications.length) {
+                const job = jobApplications.find(j => j.id === currentStudioJobId);
+                if (job && job.company) company = job.company;
+            }
+            btnText.textContent = company ? `Generate Company Research for ${company}` : 'Generate Company Research';
+        }
+        if (jobSelectDropdown) jobSelectDropdown.addEventListener('change', function(e) {
+            handleJobSelectionChange(e);
+            updateGenerateResearchBtnLabel();
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            setInitialTheme();
+            initializeApp();
+            updateGenerateResearchBtnLabel();
         });
     </script>
 </body>
