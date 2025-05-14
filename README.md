@@ -61,6 +61,7 @@ The Job Application Tracker & Tailoring Assistant is a modern, browser-based too
 3. **(Optional) For AI features:**
    - For Ollama: Install and run Ollama locally, pull a model (e.g., `llama3`), and ensure the endpoint in Settings matches your setup.
    - For Gemini: Obtain an API key from Google AI Studio, enter it in Settings.
+   - For Tavily: Obtain an API key from Tavily AI. (this is for the company research).
 4. **All data is saved in your browser.** No backend or signup required.
 
 ### Extensibility & Next Steps
