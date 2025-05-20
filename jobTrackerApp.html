@@ -390,6 +390,79 @@
             background: #e0e7ef;
             color: #b45309;
         }
+        .resume-preview-pane {
+            background: #fff;
+            color: #222;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            min-height: 200px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-top: 0.25rem;
+            overflow-x: auto;
+        }
+        body.light-mode .resume-preview-pane {
+            background: #f9fafb;
+            color: #1a202c;
+        }
+        #studioResumeInput {
+            background: #fff !important;
+            color: #222 !important;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            min-height: 200px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-top: 0.25rem;
+            overflow-x: auto;
+        }
+        body.light-mode #studioResumeInput {
+            background: #f9fafb !important;
+            color: #1a202c !important;
+        }
+        .suggestion-comment {
+            background: #fffbe6;
+            color: #b45309;
+            font-style: italic;
+            font-size: 0.98em;
+            border-radius: 0.3em;
+            padding: 0.1em 0.5em;
+            margin-left: 0.5em;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            display: inline-block;
+        }
+        .interview-substatus-tag {
+            display: inline-block;
+            padding: 0.18em 0.7em;
+            font-size: 0.92em;
+            font-weight: 600;
+            border-radius: 1em;
+            margin-right: 0.5em;
+            margin-top: 0.1em;
+            margin-bottom: 0.1em;
+            letter-spacing: 0.01em;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            border: 1px solid #e5e7eb;
+        }
+        .tag-gray { background: #e5e7eb; color: #374151; border-color: #d1d5db; }
+        .tag-blue { background: #dbeafe; color: #1e40af; border-color: #60a5fa; }
+        .tag-indigo { background: #e0e7ff; color: #3730a3; border-color: #818cf8; }
+        .tag-purple { background: #ede9fe; color: #6d28d9; border-color: #a78bfa; }
+        .tag-pink { background: #fce7f3; color: #be185d; border-color: #f472b6; }
+        .tag-red { background: #fee2e2; color: #b91c1c; border-color: #f87171; }
+        .tag-teal { background: #ccfbf1; color: #134e4a; border-color: #2dd4bf; }
+        body.light-mode #studioCoverLetterInput {
+            background: #f9fafb !important;
+            color: #1a202c !important;
+        }
+        body.light-mode #studioCoverLetterPreview {
+            background: #f9fafb;
+            color: #1a202c;
+        }
     </style>
 </head>
 <body>
@@ -405,6 +478,7 @@
         <ul>
             <li><a data-page="kanbanBoardPage" class="active"><i class="fas fa-columns"></i><span class="sidebar-link-text">Kanban Board</span></a></li>
             <li><a data-page="tailoringStudioPage"><i class="fas fa-edit"></i><span class="sidebar-link-text">Tailoring Studio</span></a></li>
+            <li><a data-page="companyResearchPage"><i class="fas fa-building"></i><span class="sidebar-link-text">Company Research</span></a></li>
             <li><a data-page="dashboardPage"><i class="fas fa-tachometer-alt"></i><span class="sidebar-link-text">Dashboard</span></a></li>
             <li><a data-page="analyticsPage"><i class="fas fa-chart-line"></i><span class="sidebar-link-text">Analytics</span></a></li>
             <li><a data-page="settingsPage"><i class="fas fa-cog"></i><span class="sidebar-link-text">Settings</span></a></li>
@@ -444,27 +518,45 @@
                     <textarea id="studioJdInput" class="w-full studio-textarea" placeholder="Paste the full job description here..."></textarea>
                 </div>
                 <div class="studio-section">
-                    <div class="field-header">
-                        <label for="studioResumeInput">Your Resume</label>
-                        <button type="button" class="btn-clear" onclick="document.getElementById('studioResumeInput').value=''">Clear</button>
+                    <div class="field-header flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <label for="studioResumeInput">Your Resume</label>
+                            <button type="button" class="btn-clear ml-2" onclick="document.getElementById('studioResumeInput').value=''">Clear</button>
+                        </div>
+                        <div class="flex items-center gap-2 mt-2 md:mt-0">
+                            <select id="resumeTemplateDropdown" class="modal-input" style="max-width:220px;"><option value="">Insert from Template...</option></select>
+                            <button id="saveResumeAsTemplateBtn" class="btn-secondary"><i class="fas fa-save mr-1"></i>Save as Template</button>
+                            <input type="text" id="studioResumeTagInput" class="modal-input text-sm" placeholder="Optional: Resume Version/Tag" style="max-width:180px;">
+                        </div>
                     </div>
-                    <div class="flex flex-col md:flex-row md:items-center mb-2 gap-2">
-                        <select id="resumeTemplateDropdown" class="modal-input md:w-1/2" style="max-width:320px;"><option value="">Insert from Template...</option></select>
-                        <button id="saveResumeAsTemplateBtn" class="btn-secondary md:w-auto"><i class="fas fa-save mr-1"></i>Save as Template</button>
+                    <div class="flex flex-col md:flex-row gap-6 mb-2">
+                        <div class="flex-1 min-w-0">
+                            <div id="studioResumeInput" class="w-full studio-textarea mt-2" contenteditable="true" aria-label="Paste your relevant resume section or full resume..." style="min-height: 200px;"></div>
+                        </div>
+                        <div class="flex-1 min-w-0 mt-6 md:mt-0">
+                            <label class="block text-sm font-medium mb-1 text-gray-300">Tailoring Suggestions</label>
+                            <div id="studioResumePreview" class="resume-preview-pane"></div>
+                        </div>
                     </div>
-                    <textarea id="studioResumeInput" class="w-full studio-textarea" placeholder="Paste your relevant resume section or full resume..."></textarea>
-                    <input type="text" id="studioResumeTagInput" class="modal-input mt-2 text-sm" placeholder="Optional: Resume Version/Tag">
                 </div>
                 <div class="studio-section">
                     <div class="field-header">
                         <label for="studioCoverLetterInput">Your Cover Letter</label>
-                        <button type="button" class="btn-clear" onclick="document.getElementById('studioCoverLetterInput').value=''">Clear</button>
+                        <button type="button" class="btn-clear" onclick="document.getElementById('studioCoverLetterInput').innerHTML=''">Clear</button>
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center mb-2 gap-2">
                         <select id="coverLetterTemplateDropdown" class="modal-input md:w-1/2" style="max-width:320px;"><option value="">Insert from Template...</option></select>
                         <button id="saveCoverLetterAsTemplateBtn" class="btn-secondary md:w-auto"><i class="fas fa-save mr-1"></i>Save as Template</button>
                     </div>
-                    <textarea id="studioCoverLetterInput" class="w-full studio-textarea" placeholder="Paste your cover letter draft..."></textarea>
+                    <div class="flex flex-col md:flex-row gap-6 mb-2">
+                        <div class="flex-1 min-w-0">
+                            <div id="studioCoverLetterInput" class="w-full studio-textarea mt-2" contenteditable="true" aria-label="Paste your cover letter draft..." style="min-height: 200px;"></div>
+                        </div>
+                        <div class="flex-1 min-w-0 mt-6 md:mt-0">
+                            <label class="block text-sm font-medium mb-1 text-gray-300">Cover Letter Preview</label>
+                            <div id="studioCoverLetterPreview" class="resume-preview-pane"></div>
+                        </div>
+                    </div>
                     <input type="text" id="studioCoverLetterTagInput" class="modal-input mt-2 text-sm" placeholder="Optional: Cover Letter Version/Tag">
                 </div>
                 <div class="my-8 text-center">
@@ -475,42 +567,6 @@
                 <div id="studioFeedbackOutputContainer" class="feedback-output-container hidden">
                     <h4><i class="fas fa-lightbulb mr-2"></i>Tailoring Feedback:</h4>
                     <div id="studioFeedbackOutputText" class="studio-feedback-output-text" style="font-size:1.05rem;line-height:1.7;font-family:inherit;white-space:normal;"></div>
-                </div>
-                <div class="studio-section mt-8">
-                    <div class="field-header">
-                        <label for="studioCompanyResearchInput">Company Research Notes</label>
-                        <button type="button" class="btn-clear" onclick="document.getElementById('studioCompanyResearchInput').value=''; document.getElementById('studioResearchOutputContainer').classList.add('hidden');">Clear All</button>
-                    </div>
-                    <textarea id="studioCompanyResearchInput" class="w-full studio-textarea" placeholder="Add your company research notes here..."></textarea>
-                    <div class="my-4 text-center">
-                        <button id="studioGenerateResearchBtn" class="btn-primary py-3 px-6 text-lg">
-                            <i class="fas fa-building mr-2"></i>
-                            <span id="generateResearchBtnText">Generate Company Research</span>
-                        </button>
-                    </div>
-                    <div id="studioResearchOutputContainer" class="research-output-container hidden">
-                        <h4><i class="fas fa-building mr-2"></i>Sample Company Research:</h4>
-                        <div id="studioResearchOutputText"></div>
-                        <div id="researchDebugContainer" style="margin-top:1.5em; display:none;">
-                            <button id="toggleDebugBtn" class="btn-secondary mb-3">Show/Hide Debug Info</button>
-                            <div style="font-size:0.95em; background:#23293a; color:#cbd5e1; border-radius:0.3em; padding:1em; margin-bottom:1em;">
-                                <strong>Tavily Search Result:</strong>
-                                <pre id="tavilySearchDebug" style="white-space:pre-wrap; word-break:break-all;"></pre>
-                            </div>
-                            <div style="font-size:0.95em; background:#23293a; color:#cbd5e1; border-radius:0.3em; padding:1em; margin-bottom:1em;">
-                                <strong>Tavily Extract Result:</strong>
-                                <pre id="tavilyExtractDebug" style="white-space:pre-wrap; word-break:break-all;"></pre>
-                            </div>
-                            <div style="font-size:0.95em; background:#23293a; color:#cbd5e1; border-radius:0.3em; padding:1em; margin-bottom:1em;">
-                                <strong>Gemini Prompt:</strong>
-                                <pre id="geminiPromptDebug" style="white-space:pre-wrap; word-break:break-all;"></pre>
-                            </div>
-                            <div style="font-size:0.95em; background:#23293a; color:#cbd5e1; border-radius:0.3em; padding:1em;">
-                                <strong>Gemini Response (Raw):</strong>
-                                <pre id="geminiResponseDebug" style="white-space:pre-wrap; word-break:break-all;"></pre>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -606,6 +662,64 @@
                  <p class="text-gray-400">More settings coming soon...</p>
             </div>
         </div>
+
+        <div id="companyResearchPage" class="page-section">
+            <header class="mb-6">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-100">Company Research</h1>
+            </header>
+            <div id="companyResearchJobSelectionContainer" class="mb-6 studio-section">
+                <label for="companyResearchJobSelectDropdown" class="block text-lg font-medium mb-2 text-gray-300">Select Job Application for Research:</label>
+                <select id="companyResearchJobSelectDropdown" class="page-select">
+                    <option value="">-- Select a Job --</option>
+                </select>
+            </div>
+            <div id="companyResearchSectionsContainer" class="">
+                <div class="studio-section">
+                    <div class="field-header">
+                        <label for="companyResearchNotesInput">Company Research Notes</label>
+                        <button type="button" class="btn-clear" onclick="document.getElementById('companyResearchNotesInput').value=''; document.getElementById('companyResearchOutputContainer').classList.add('hidden');">Clear All</button>
+                    </div>
+                    <textarea id="companyResearchNotesInput" class="w-full studio-textarea" placeholder="Add your company research notes here..."></textarea>
+                    <div class="my-4 text-center">
+                        <button id="companyResearchGenerateBtn" class="btn-primary py-3 px-6 text-lg">
+                            <i class="fas fa-building mr-2"></i>
+                            <span id="companyResearchGenerateBtnText">Generate Company Research</span>
+                        </button>
+                    </div>
+                    <div id="companyResearchOutputContainer" class="research-output-container hidden">
+                        <h4><i class="fas fa-building mr-2"></i>Company Research:</h4>
+                        <div id="companyResearchOutputText"></div>
+                        <div class="flex justify-end mt-4">
+                            <button id="saveCompanyResearchBtn" class="btn-primary" style="display:none;"><i class="fas fa-save mr-1"></i>Save Research</button>
+                        </div>
+                        <div id="companyResearchDebugContainer" style="margin-top:1.5em; display:none;">
+                            <button id="companyResearchToggleDebugBtn" class="btn-secondary mb-3">Show/Hide Debug Info</button>
+                            <div style="font-size:0.95em; background:#23293a; color:#cbd5e1; border-radius:0.3em; padding:1em; margin-bottom:1em;">
+                                <strong>Tavily Search Result:</strong>
+                                <pre id="companyResearchTavilySearchDebug" style="white-space:pre-wrap; word-break:break-all;"></pre>
+                            </div>
+                            <div style="font-size:0.95em; background:#23293a; color:#cbd5e1; border-radius:0.3em; padding:1em; margin-bottom:1em;">
+                                <strong>Tavily Extract Result:</strong>
+                                <pre id="companyResearchTavilyExtractDebug" style="white-space:pre-wrap; word-break:break-all;"></pre>
+                            </div>
+                            <div style="font-size:0.95em; background:#23293a; color:#cbd5e1; border-radius:0.3em; padding:1em; margin-bottom:1em;">
+                                <strong>Gemini Prompt:</strong>
+                                <pre id="companyResearchGeminiPromptDebug" style="white-space:pre-wrap; word-break:break-all;"></pre>
+                            </div>
+                            <div style="font-size:0.95em; background:#23293a; color:#cbd5e1; border-radius:0.3em; padding:1em;">
+                                <strong>Gemini Response (Raw):</strong>
+                                <pre id="companyResearchGeminiResponseDebug" style="white-space:pre-wrap; word-break:break-all;"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="savedCompanyResearchSection" class="studio-section mt-8" style="display:none;">
+            <h3 class="text-lg font-semibold mb-4 text-gray-100 border-b border-gray-600 pb-2">Saved Company Research</h3>
+            <ul id="savedCompanyResearchList" class="mb-2"></ul>
+            <div id="savedCompanyResearchView" class="research-output-container hidden"></div>
+        </div>
     </div>
 
     <div id="jobModal" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal">
@@ -615,14 +729,35 @@
                 <input type="hidden" id="jobId">
                 <div class="mb-4"> <label for="jobTitle" class="block text-sm font-medium mb-1">Job Title</label> <input type="text" id="jobTitle" class="modal-input" required> </div>
                 <div class="mb-4"> <label for="company" class="block text-sm font-medium mb-1">Company</label> <input type="text" id="company" class="modal-input" required> </div>
-                <div class="mb-4"> <label for="jobDescriptionLink" class="block text-sm font-medium mb-1">Job Description Link</label> <input type="url" id="jobDescriptionLink" class="modal-input" placeholder="https://..."> </div>
-                <div class="mb-4"> <label for="resumeLink" class="block text-sm font-medium mb-1">Resume Link</label> <input type="url" id="resumeLink" class="modal-input" placeholder="https://..."> </div>
-                <div class="mb-4"> <label for="coverLetterLink" class="block text-sm font-medium mb-1">Cover Letter Link</label> <input type="url" id="coverLetterLink" class="modal-input" placeholder="https://..."> </div>
+                <div class="mb-4"> <label for="jobDescriptionLink" class="block text-sm font-medium mb-1">Job Description Link</label> <div class="flex gap-2"><input type="url" id="jobDescriptionLink" class="modal-input flex-1" placeholder="https://..."> <button type="button" id="openJobDescriptionLinkBtn" class="btn-secondary" title="Open Link" disabled><i class="fas fa-external-link-alt"></i></button></div> </div>
+                <div class="mb-4"> <label for="resumeLink" class="block text-sm font-medium mb-1">Resume Link</label> <div class="flex gap-2"><input type="url" id="resumeLink" class="modal-input flex-1" placeholder="https://..."> <button type="button" id="openResumeLinkBtn" class="btn-secondary" title="Open Link" disabled><i class="fas fa-external-link-alt"></i></button></div> </div>
+                <div class="mb-4"> <label for="coverLetterLink" class="block text-sm font-medium mb-1">Cover Letter Link</label> <div class="flex gap-2"><input type="url" id="coverLetterLink" class="modal-input flex-1" placeholder="https://..."> <button type="button" id="openCoverLetterLinkBtn" class="btn-secondary" title="Open Link" disabled><i class="fas fa-external-link-alt"></i></button></div> </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div> <label for="applicationDate" class="block text-sm font-medium mb-1">Application Date</label> <input type="date" id="applicationDate" class="modal-input"> </div>
                     <div> <label for="followUpDate" class="block text-sm font-medium mb-1">Follow-Up Date</label> <input type="date" id="followUpDate" class="modal-input"> </div>
                 </div>
                 <div class="mb-4"> <label for="status" class="block text-sm font-medium mb-1">Status</label> <select id="status" class="modal-select"> </select> </div>
+                <div class="mb-4 flex items-center gap-2">
+                    <input type="checkbox" id="referralCheckbox" class="form-checkbox" />
+                    <label for="referralCheckbox" class="text-sm font-medium">This job was a referral</label>
+                </div>
+                <div class="mb-4" id="referralFromContainer" style="display:none;">
+                    <label for="referralFromInput" class="block text-sm font-medium mb-1">Referred by</label>
+                    <input type="text" id="referralFromInput" class="modal-input" placeholder="Enter name or contact" />
+                </div>
+                <div class="mb-4" id="substatusContainer" style="display:none;">
+                    <label for="substatus" class="block text-sm font-medium mb-1">Interview Substatus</label>
+                    <select id="substatus" class="modal-select">
+                        <option value="">-- Select Substatus --</option>
+                        <option value="Recruiter">Recruiter</option>
+                        <option value="Screening">Screening</option>
+                        <option value="Round 1">Round 1</option>
+                        <option value="Round 2">Round 2</option>
+                        <option value="Round 3">Round 3</option>
+                        <option value="Round 4">Round 4</option>
+                        <option value="Round 5">Round 5</option>
+                    </select>
+                </div>
                 <div class="mb-6"> <label for="notes" class="block text-sm font-medium mb-1">Notes</label> <textarea id="notes" rows="4" class="modal-textarea"></textarea> </div>
                 <div class="flex justify-end space-x-3"> <button type="button" id="cancelBtn" class="btn-secondary">Cancel</button> <button type="submit" class="btn-primary">Save Job</button> </div>
             </form>
@@ -734,6 +869,19 @@
         const saveResumeAsTemplateBtn = document.getElementById('saveResumeAsTemplateBtn');
         const saveCoverLetterAsTemplateBtn = document.getElementById('saveCoverLetterAsTemplateBtn');
         const cancelTemplateBtn = document.getElementById('cancelTemplateBtn');
+        const companyResearchJobSelectDropdown = document.getElementById('companyResearchJobSelectDropdown');
+        const companyResearchNotesInput = document.getElementById('companyResearchNotesInput');
+        const companyResearchGenerateBtn = document.getElementById('companyResearchGenerateBtn');
+        const companyResearchGenerateBtnText = document.getElementById('companyResearchGenerateBtnText');
+        const companyResearchOutputContainer = document.getElementById('companyResearchOutputContainer');
+        const companyResearchOutputText = document.getElementById('companyResearchOutputText');
+        const companyResearchDebugContainer = document.getElementById('companyResearchDebugContainer');
+        const companyResearchTavilySearchDebug = document.getElementById('companyResearchTavilySearchDebug');
+        const companyResearchTavilyExtractDebug = document.getElementById('companyResearchTavilyExtractDebug');
+        const companyResearchGeminiPromptDebug = document.getElementById('companyResearchGeminiPromptDebug');
+        const companyResearchGeminiResponseDebug = document.getElementById('companyResearchGeminiResponseDebug');
+        const companyResearchToggleDebugBtn = document.getElementById('companyResearchToggleDebugBtn');
+        const studioResumePreview = document.getElementById('studioResumePreview');
 
         // --- Utility Functions ---
         const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
@@ -748,6 +896,10 @@
             pageSections.forEach(section => section.classList.remove('active'));
             const targetPage = document.getElementById(pageId);
             if (targetPage) targetPage.classList.add('active');
+
+            // Hide Saved Research section by default
+            const savedResearchSection = document.getElementById('savedCompanyResearchSection');
+            if (savedResearchSection) savedResearchSection.style.display = 'none';
 
             sidebarLinks.forEach(link => {
                 link.classList.remove('active');
@@ -767,6 +919,13 @@
                 updateLlmConfigUI();
             } else if (pageId === 'dashboardPage') {
                 renderDashboardPage(); // Combined dashboard rendering
+            } else if (pageId === 'companyResearchPage') {
+                populateCompanyResearchJobDropdown();
+                updateCompanyResearchGenerateBtnLabel();
+                // Show Saved Research section if there are entries
+                if (savedResearchSection && getSavedCompanyResearch().length) {
+                    savedResearchSection.style.display = '';
+                }
             }
         }
 
@@ -843,6 +1002,14 @@
         function openJobModal(jobData = null) {
             jobForm.reset();
             statusInput.innerHTML = KANBAN_COLUMNS.map(col => `<option value="${col}">${col}</option>`).join('');
+            // Show/hide substatus
+            const showSubstatus = (jobData && jobData.status === 'Interview') || (statusInput.value === 'Interview');
+            document.getElementById('substatusContainer').style.display = showSubstatus ? '' : 'none';
+            if (showSubstatus && jobData && jobData.substatus) {
+                document.getElementById('substatus').value = jobData.substatus;
+            } else {
+                document.getElementById('substatus').value = '';
+            }
             if (jobData) {
                 modalTitle.textContent = 'Edit Job Application';
                 jobIdInput.value = jobData.id;
@@ -855,13 +1022,23 @@
                 followUpDateInput.value = jobData.followUpDate || '';
                 statusInput.value = jobData.status;
                 notesInput.value = jobData.notes || '';
+                if (jobData.status === 'Interview') {
+                    document.getElementById('substatusContainer').style.display = '';
+                    document.getElementById('substatus').value = jobData.substatus || '';
+                }
             } else {
                 modalTitle.textContent = 'Add New Job Application';
                 jobIdInput.value = '';
                 if (KANBAN_COLUMNS.length > 0) statusInput.value = KANBAN_COLUMNS[0];
+                document.getElementById('substatusContainer').style.display = 'none';
+                document.getElementById('substatus').value = '';
             }
             jobModal.classList.remove('hidden');
             jobModal.classList.add('flex');
+            // Referral fields
+            document.getElementById('referralCheckbox').checked = jobData && jobData.referral ? true : false;
+            document.getElementById('referralFromInput').value = jobData && jobData.referralFrom ? jobData.referralFrom : '';
+            document.getElementById('referralFromContainer').style.display = (jobData && jobData.referral) ? '' : 'none';
         }
         function closeJobModal() {
             jobModal.classList.add('hidden');
@@ -954,6 +1131,7 @@
             company.classList.add('text-sm', 'text-gray-300', 'truncate');
             company.innerHTML = `<i class="fas fa-building mr-1 text-gray-400"></i> ${job.company}`;
             card.appendChild(company);
+
             const buttonsContainer = document.createElement('div');
             buttonsContainer.classList.add('mt-3', 'flex', 'justify-end', 'space-x-2');
             const editButton = document.createElement('button');
@@ -968,10 +1146,37 @@
             deleteButton.classList.add('text-xs', 'text-red-400', 'hover:text-red-200', 'py-1', 'px-2', 'rounded');
             deleteButton.onclick = (e) => { e.stopPropagation(); deleteJob(job.id); };
             buttonsContainer.appendChild(deleteButton);
-            card.appendChild(buttonsContainer);
+
+            // Substatus tag and action icons row (below title/company)
+            const row = document.createElement('div');
+            row.style.display = 'flex';
+            row.style.alignItems = 'center';
+            row.style.justifyContent = 'space-between';
+            row.style.marginTop = '0.7em';
+            if (job.status === 'Interview' && job.substatus) {
+                const tag = document.createElement('span');
+                tag.className = 'interview-substatus-tag ' + getSubstatusTagClass(job.substatus);
+                tag.textContent = job.substatus;
+                row.appendChild(tag);
+            } else {
+                // Empty space to keep alignment if no tag
+                const spacer = document.createElement('span');
+                spacer.style.flex = '1';
+                row.appendChild(spacer);
+            }
+            row.appendChild(buttonsContainer);
+            card.appendChild(row);
+
             card.addEventListener('click', (e) => { if (!e.target.closest('button')) openJobModal(job); });
             card.addEventListener('dragstart', handleDragStart);
             card.addEventListener('dragend', handleDragEnd);
+            // Referral info (show at bottom of card if present)
+            if (job.referral && job.referralFrom) {
+                const referralDiv = document.createElement('div');
+                referralDiv.className = 'text-xs text-emerald-400 mt-2';
+                referralDiv.innerHTML = `<i class="fas fa-user-friends mr-1"></i>Referral: <span class="font-semibold">${job.referralFrom}</span>`;
+                card.appendChild(referralDiv);
+            }
             return card;
         }
         
@@ -1109,15 +1314,13 @@
         async function handleStudioGenerateFeedback() {
             if (!currentStudioJobId) { alert("Please select a job first."); return; }
             const jd = studioJdInput.value.trim();
-            const resume = studioResumeInput.value.trim();
-            const coverLetter = studioCoverLetterInput.value.trim();
+            const resume = studioResumeInput.innerHTML.trim(); // Use HTML from contenteditable
+            const coverLetter = studioCoverLetterInput.innerHTML.trim();
             if (!jd || !resume) { alert("Please paste the Job Description and your Resume."); return; }
-            studioFeedbackOutputText.textContent = "Generating suggestions, please wait...";
-            studioFeedbackOutputContainer.classList.remove('hidden');
-            studioFeedbackOutputContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            studioResumePreview.innerHTML = "<em>Generating suggestions, please wait...</em>";
             const provider = localStorage.getItem(LLM_PROVIDER_KEY) || 'ollama';
             let suggestions = "";
-            const prompt = `Analyze the following Job Description, Resume, and Cover Letter. Provide specific, actionable suggestions to tailor the resume and cover letter to better match the Job Description. Focus on identifying skill gaps, keywords, and areas where the applicant can better highlight their experience relevant to the role. Job Description: --- ${jd} --- Resume: --- ${resume} --- Cover Letter (if provided): --- ${coverLetter || "No cover letter provided."} --- Suggestions:`;
+            const prompt = `You are an expert AI assistant helping users tailor their resumes and cover letters to specific job descriptions.\n\nPlease analyze the user's resume and cover letter (if provided) and compare them to the job description below. Then return **formatted tailoring suggestions** that improve alignment with the job, using the structure and markdown formatting guidelines below.\n\n### Formatting Instructions:\n- Use clear **section headers** (e.g., ## I. Keyword & Theme Identification)\n- Use **bold** for key actions, section titles, and keywords.\n- Use *italics* for explanations or emphasis.\n- Use line breaks and spacing to make the output easy to scan.\n- Use bullet points or numbered lists where appropriate.\n- Organize feedback by resume section (e.g., Professional Summary, Experience at Company X, Skills).\n- If a cover letter is provided, add a dedicated section: ## V. Cover Letter Suggestions\n\n### Output Structure Example:\n\n## I. Keyword & Theme Identification\n\n**Core Themes:** *AI Platforms, Cloud-native architecture, Enterprise Integration, B2B SaaS*  \n**Skills & Tools:** \`Python\`, \`Azure\`, \`Kubernetes\`, *API Integration*  \n**Responsibilities:** Roadmap Ownership, GTM Strategy, Sales Enablement  \n**Outcomes:** *Scalability, Revenue Growth, Innovation*\n\n---\n\n## II. Tailored Resume Suggestions\n\n### 🔹 *Professional Summary*\n\n- **Add:** *"AI Platform experience in the energy sector"*  \n  *Why:* Matches Geminus's focus directly.\n\n- **Change:** "data solution adoption" → **"AI platform adoption"**  \n  *Why:* Aligns with language used in the JD.\n\n### 🔹 *Company Name (e.g., Packsize)*\n\n**Original Bullet:**  \n> Led 0–1 development of AI-driven SaaS platforms...\n\n**Revised:**  \n> **Spearheaded** 0–1 development and deployment of a predictive maintenance platform using Azure and edge sensor data, improving inventory accuracy by **15%**.\n\n*Why:* Adds measurable impact and aligns better with role keywords.\n\n---\n\n## III. Skills Section\n\n- **Add:** \`Cloud-Native Architecture\`, \`Enterprise Integration Patterns\`  \n- **Optional:** *Mention Kubernetes/OpenShift only if you have conceptual understanding.*\n\n---\n\n## IV. General Improvements\n\n- ✅ **Add Metrics:** Wherever possible, quantify results.\n- ✅ **Keep Formatting Consistent:** Use bold/italics for emphasis.\n- ✅ **Highlight Ownership and Outcomes:** Prioritize action + result style.\n\n---\n\n## V. Cover Letter Suggestions\n\n- **Add:** *A strong opening statement that references the company's mission.*\n- **Change:** "I am writing to apply..." → "I am excited to contribute to [Company]'s mission of [X]..."\n- **General:** *Highlight alignment with job description keywords and company values.*\n\n---\n\nJob Description: --- ${jd} ---\nResume (HTML): --- ${resume} ---\nCover Letter (HTML): --- ${coverLetter || "No cover letter provided."} ---\n\nReturn only the suggestions as markdown or HTML, following the structure and formatting above.`;
             try {
                 if (provider === 'ollama') {
                     const endpoint = localStorage.getItem(OLLAMA_ENDPOINT_KEY) || 'http://localhost:11434/api/generate';
@@ -1137,9 +1340,19 @@
                     if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) { suggestions = data.candidates[0].content.parts[0].text; }
                     else { suggestions = "No suggestion received or unexpected format from Gemini."; console.warn("Gemini response format unexpected:", data); }
                 }
-                // Use marked.js for markdown rendering
-                studioFeedbackOutputText.innerHTML = marked.parse(suggestions.trim());
-            } catch (error) { console.error("Error generating feedback:", error); studioFeedbackOutputText.textContent = `Error: ${error.message}. Please check your LLM configuration in Settings and network.`; }
+                // Show suggestions in the preview only
+                if (suggestions) {
+                    // If the output looks like a resume (lots of <h1>, <h2>, <b>, etc.), warn the user
+                    if (/max locher|professional summary|experience|education|skills|<h1|<h2|<b|<strong/i.test(suggestions) && suggestions.length > 200) {
+                        studioResumePreview.innerHTML = '<div style="color:#fbbf24;font-weight:bold;">The AI returned a rewritten resume. Please review the prompt or try again. Only actionable suggestions should appear here.</div>' + '<hr>' + marked.parse(suggestions.trim());
+                    } else {
+                        studioResumePreview.innerHTML = '<h3 style="color:#60a5fa;">Tailoring Suggestions:</h3>' + marked.parse(suggestions.trim());
+                    }
+                }
+            } catch (error) {
+                console.error("Error generating feedback:", error);
+                studioResumePreview.innerHTML = `<span style=\"color:#e53e3e;\">Error: ${error.message}</span>`;
+            }
         }
         async function handleStudioGenerateResearch() {
             if (!currentStudioJobId) { alert("Please select a job first."); return; }
@@ -1321,7 +1534,10 @@ If information is missing, say so in the relevant section.`;
                 jobTitle: jobTitleInput.value.trim(), company: companyInput.value.trim(),
                 jobDescriptionLink: jobDescriptionLinkInput.value.trim(), resumeLink: resumeLinkInput.value.trim(),
                 coverLetterLink: coverLetterLinkInput.value.trim(), applicationDate: applicationDateInput.value,
-                followUpDate: followUpDateInput.value, status: statusInput.value, notes: notesInput.value.trim()
+                followUpDate: followUpDateInput.value, status: statusInput.value, notes: notesInput.value.trim(),
+                substatus: (statusInput.value === 'Interview') ? document.getElementById('substatus').value : '',
+                referral: document.getElementById('referralCheckbox').checked,
+                referralFrom: document.getElementById('referralCheckbox').checked ? document.getElementById('referralFromInput').value.trim() : ''
             };
             if (!jobData.jobTitle || !jobData.company) { alert("Job Title and Company are required."); return; }
             if (id) { const jobIndex = jobApplications.findIndex(j => j.id === id); if (jobIndex !== -1) { jobApplications[jobIndex] = { ...jobApplications[jobIndex], ...jobData }; }
@@ -1345,7 +1561,6 @@ If information is missing, say so in the relevant section.`;
         if (kanbanSearchInput) kanbanSearchInput.addEventListener('input', (e) => renderKanbanBoard(e.target.value));
         cancelBtn.addEventListener('click', closeJobModal);
         jobForm.addEventListener('submit', handleJobFormSubmit);
-        jobModal.addEventListener('click', (event) => { if (event.target === jobModal) closeJobModal(); });
         if (llmProviderSelect) llmProviderSelect.addEventListener('change', updateLlmConfigUI);
         if (saveLlmConfigBtn) saveLlmConfigBtn.addEventListener('click', saveLlmConfig);
         if (jobSelectDropdown) jobSelectDropdown.addEventListener('change', handleJobSelectionChange);
@@ -1378,6 +1593,13 @@ If information is missing, say so in the relevant section.`;
         if (saveResumeAsTemplateBtn) saveResumeAsTemplateBtn.addEventListener('click', () => saveTemplate('resume'));
         if (saveCoverLetterAsTemplateBtn) saveCoverLetterAsTemplateBtn.addEventListener('click', () => saveTemplate('coverLetter'));
         if (cancelTemplateBtn) cancelTemplateBtn.addEventListener('click', closeTemplateModal);
+        if (companyResearchJobSelectDropdown) companyResearchJobSelectDropdown.addEventListener('change', handleCompanyResearchJobSelectionChange);
+        if (companyResearchGenerateBtn) companyResearchGenerateBtn.addEventListener('click', handleCompanyResearchGenerate);
+        if (companyResearchToggleDebugBtn && companyResearchDebugContainer) {
+            companyResearchToggleDebugBtn.addEventListener('click', function() {
+                companyResearchDebugContainer.style.display = companyResearchDebugContainer.style.display === 'none' ? '' : 'none';
+            });
+        }
 
         window.addEventListener('resize', () => {
             if (window.innerWidth <= 768 && sidebar.classList.contains('collapsed')) {}
@@ -1391,6 +1613,7 @@ If information is missing, say so in the relevant section.`;
             loadLlmConfig(); 
             renderKanbanBoard(); 
             switchPage('kanbanBoardPage'); 
+            populateCompanyResearchJobDropdown();
         }
         function setTheme(mode) {
             if (mode === 'light') {
@@ -1433,7 +1656,7 @@ If information is missing, say so in the relevant section.`;
             document.getElementById('templateModalTitle').textContent = (template ? 'Edit' : 'Add') + (templateType === 'resume' ? ' Resume Template' : ' Cover Letter Template');
             document.getElementById('templateModal').classList.remove('hidden');
             document.getElementById('templateModal').classList.add('flex');
-            setTimeout(() => { document.getElementById('templateNameInput').focus(); }, 100);
+            setTimeout(() => { document.getElementById('templateNameIdddddddddddddddddddddddddddsdfghjfghjfghjfghnput').focus(); }, 100);
         }
         function closeTemplateModal() {
             document.getElementById('templateModal').classList.add('hidden');
@@ -1595,7 +1818,7 @@ If information is missing, say so in the relevant section.`;
             const id = this.value;
             if(!id) return;
             const t = getTemplates('resume').find(t => t.id === id);
-            if(t) studioResumeInput.value = t.content;
+            if(t) studioResumeInput.innerHTML = t.content;
             this.value = '';
         });
         if(coverLetterTemplateDropdown) coverLetterTemplateDropdown.addEventListener('change', function() {
@@ -1608,11 +1831,20 @@ If information is missing, say so in the relevant section.`;
         // --- Save as Template from Tailoring Studio ---
         if(saveResumeAsTemplateBtn) saveResumeAsTemplateBtn.onclick = function(e) {
             e.preventDefault && e.preventDefault();
-            if (!studioResumeInput.value.trim()) {
+            const resumeContent = studioResumeInput.innerHTML.trim();
+            if (!resumeContent) {
                 alert('Please enter your resume content before saving as a template.');
                 return;
             }
-            openTemplateModal('resume', { name: '', content: studioResumeInput.value });
+            const name = prompt('Enter a name for this resume template:');
+            if (!name) return;
+            // Save to localStorage under 'resumeTemplates'
+            let arr = getTemplates('resume');
+            arr.push({ id: generateId(), name, content: resumeContent });
+            saveTemplates('resume', arr);
+            renderTemplateLists && renderTemplateLists();
+            renderTemplateDropdowns && renderTemplateDropdowns();
+            alert('Resume template saved!');
         };
         if(saveCoverLetterAsTemplateBtn) saveCoverLetterAsTemplateBtn.onclick = function(e) {
             e.preventDefault && e.preventDefault();
@@ -1650,6 +1882,369 @@ If information is missing, say so in the relevant section.`;
             initializeApp();
             updateGenerateResearchBtnLabel();
         });
+
+        // --- Company Research Page ---
+        function populateCompanyResearchJobDropdown() {
+            if (!companyResearchJobSelectDropdown) return;
+            companyResearchJobSelectDropdown.innerHTML = '<option value="">-- Select a Job --</option>';
+            jobApplications.forEach(job => {
+                const option = document.createElement('option');
+                option.value = job.id;
+                option.textContent = `${job.jobTitle} at ${job.company}`;
+                companyResearchJobSelectDropdown.appendChild(option);
+            });
+        }
+        let currentCompanyResearchJobId = null;
+        function handleCompanyResearchJobSelectionChange(event) {
+            currentCompanyResearchJobId = event.target.value;
+            if (currentCompanyResearchJobId) {
+                companyResearchNotesInput.value = '';
+                companyResearchOutputContainer.classList.add('hidden');
+                companyResearchOutputText.textContent = '';
+            } else {
+                companyResearchNotesInput.value = '';
+                companyResearchOutputContainer.classList.add('hidden');
+                companyResearchOutputText.textContent = '';
+            }
+            updateCompanyResearchGenerateBtnLabel();
+        }
+        function updateCompanyResearchGenerateBtnLabel() {
+            if (!companyResearchGenerateBtnText) return;
+            let company = '';
+            if (currentCompanyResearchJobId && jobApplications && jobApplications.length) {
+                const job = jobApplications.find(j => j.id === currentCompanyResearchJobId);
+                if (job && job.company) company = job.company;
+            }
+            companyResearchGenerateBtnText.textContent = company ? `Generate Company Research for ${company}` : 'Generate Company Research';
+        }
+        async function handleCompanyResearchGenerate() {
+            if (!currentCompanyResearchJobId) { alert("Please select a job first."); return; }
+            const selectedJob = jobApplications.find(job => job.id === currentCompanyResearchJobId);
+            if (!selectedJob) return;
+            const tavilyApiKey = localStorage.getItem(TAVILY_API_KEY_KEY) || '';
+            const geminiApiKey = localStorage.getItem(GEMINI_API_KEY_KEY) || '';
+            // Clear debug info
+            if (companyResearchTavilySearchDebug) companyResearchTavilySearchDebug.textContent = '';
+            if (companyResearchTavilyExtractDebug) companyResearchTavilyExtractDebug.textContent = '';
+            if (companyResearchGeminiPromptDebug) companyResearchGeminiPromptDebug.textContent = '';
+            if (companyResearchGeminiResponseDebug) companyResearchGeminiResponseDebug.textContent = '';
+            if (companyResearchDebugContainer) companyResearchDebugContainer.style.display = 'none';
+            if (tavilyApiKey && geminiApiKey) {
+                companyResearchOutputText.innerHTML = '<em>Fetching company research from Tavily, please wait...</em>';
+                companyResearchOutputContainer.classList.remove('hidden');
+                companyResearchOutputContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                try {
+                    // Step 1: Tavily Multi-Query Search (Best Practices)
+                    const subQueries = [
+                        `${selectedJob.company} company overview`,
+                        `${selectedJob.company} products and services`,
+                        `${selectedJob.company} leadership team`,
+                        `${selectedJob.company} financials`,
+                        `${selectedJob.company} competitors`,
+                        `${selectedJob.company} recent news`
+                    ];
+                    let allResults = [];
+                    let allUrls = [];
+                    let searchDebugArr = [];
+                    for (const q of subQueries) {
+                        const searchRes = await fetch('https://api.tavily.com/search', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer ' + tavilyApiKey
+                            },
+                            body: JSON.stringify({
+                                query: q,
+                                search_depth: 'advanced',
+                                max_results: 5,
+                                chunks_per_source: 3,
+                                include_raw_content: false
+                            })
+                        });
+                        if (!searchRes.ok) throw new Error('Tavily Search error: ' + searchRes.status + ' ' + searchRes.statusText);
+                        const searchData = await searchRes.json();
+                        searchDebugArr.push({query: q, results: searchData.results});
+                        if (searchData.results) {
+                            allResults.push(...searchData.results);
+                        }
+                    }
+                    if (companyResearchTavilySearchDebug) companyResearchTavilySearchDebug.textContent = JSON.stringify(searchDebugArr, null, 2);
+                    // Filter by score > 0.5, deduplicate URLs
+                    allUrls = allResults.filter(r => r.score > 0.5 && r.url).map(r => r.url);
+                    allUrls = [...new Set(allUrls)];
+                    // Limit to 10 URLs and filter for valid URLs
+                    allUrls = allUrls.filter(url => /^https?:\/\//.test(url)).slice(0, 10);
+                    if (!allUrls.length) throw new Error('No valid URLs to extract.');
+                    // Step 2: Tavily Extract (Best Practices)
+                    companyResearchOutputText.innerHTML = '<em>Extracting content from sources...</em>';
+                    const extractResponse = await fetch('https://api.tavily.com/extract', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + tavilyApiKey
+                        },
+                        body: JSON.stringify({
+                            urls: allUrls,
+                            extract_depth: 'advanced'
+                        })
+                    });
+                    if (!extractResponse.ok) throw new Error('Tavily Extract error: ' + extractResponse.status + ' ' + extractResponse.statusText);
+                    const extractData = await extractResponse.json();
+                    if (companyResearchTavilyExtractDebug) companyResearchTavilyExtractDebug.textContent = JSON.stringify(extractData, null, 2);
+                    const extracted = (extractData.results || []).map(res => ({
+                        url: res.url,
+                        title: res.title || res.url,
+                        content: res.raw_content || res.content || ''
+                    })).filter(res => res.content);
+                    if (!extracted.length) throw new Error('No content extracted from sources.');
+                    // Step 3: Gemini LLM
+                    companyResearchOutputText.innerHTML = '<em>Generating detailed research report with Gemini...</em>';
+                    const geminiPrompt = `Using the following web content and sources, write a detailed company research report for ${selectedJob.company}.
+\n**Format the report using markdown:**\n- Start with a short summary at the top.\n- Use '##' for each main section heading.\n- Use bullet points for all lists and sublists wherever appropriate (do not use plain text for lists).\n- Use tables for structured data (if available).\n- Bold section titles and key facts.\n\nSections to include:\n- Company Overview\n- Core Products and Services\n- Leadership Team\n- Target Market and Partnerships\n- Business Model and Distribution\n- Key Differentiators\n- Industry Overview\n- Competition\n- Competitive Advantages and Challenges\n- Financial Overview\n- News\n- References (with links)\n\nWeb Content:\n${extracted.map(e => `Source: ${e.title}\nURL: ${e.url}\nContent: ${e.content.substring(0, 3000)}...`).join('\n\n')}\n\nIf information is missing, say so in the relevant section.`;
+                    if (companyResearchGeminiPromptDebug) companyResearchGeminiPromptDebug.textContent = geminiPrompt;
+                    const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
+                    const geminiResponse = await fetch(geminiApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: geminiPrompt }] }] })
+                    });
+                    if (!geminiResponse.ok) {
+                        const errorData = await geminiResponse.json();
+                        throw new Error(`Gemini API error: ${geminiResponse.status} ${geminiResponse.statusText} - ${errorData.error?.message || 'Unknown error'}`);
+                    }
+                    const geminiData = await geminiResponse.json();
+                    if (companyResearchGeminiResponseDebug) companyResearchGeminiResponseDebug.textContent = JSON.stringify(geminiData, null, 2);
+                    let report = '';
+                    if (geminiData.candidates && geminiData.candidates[0]?.content?.parts?.[0]?.text) {
+                        report = geminiData.candidates[0].content.parts[0].text;
+                    } else {
+                        report = 'No report received or unexpected format from Gemini.';
+                    }
+                    companyResearchOutputText.innerHTML = marked.parse(report.trim());
+                    if (companyResearchDebugContainer) companyResearchDebugContainer.style.display = '';
+                } catch (err) {
+                    companyResearchOutputText.innerHTML = `<span style=\"color:#e53e3e;\">Error: ${err.message}</span>`;
+                    if (companyResearchDebugContainer) companyResearchDebugContainer.style.display = '';
+                }
+                return;
+            }
+            // Fallback to static template if no API key(s)
+            const sampleResearch = `## Company Overview: ${selectedJob.company}\n**Mission:** [Simulated: To revolutionize the industry through innovative AI solutions that empower businesses and individuals.]\n**Recent News & Developments:**\n- Announced Series B funding of $XX million to expand R&D in generative AI. (Source: TechCrunch, [Date])\n- Launched new product '[Product Name]' aimed at [Target Market], receiving positive early reviews for its [Key Feature]. (Source: Company Blog, [Date])\n- Keynote speech by CEO at [Conference Name] highlighted focus on ethical AI development.\n**Products/Services:**\n- Core Product A: [Brief description and key benefits]\n- Service B: [Brief description and target clients]\n- New Initiative C: [Details about upcoming or recent projects]\n**Culture & Values (from Glassdoor/Company Website):**\n- Emphasis on collaboration and innovation.\n- Fast-paced environment.\n- Commitment to diversity and inclusion.\n**Potential Talking Points/Alignment:**\n- Your experience in [Relevant Skill/Project] aligns well with their recent launch of '[Product Name]'.\n- The company's focus on [Specific Value/Mission Point] resonates with your career goals in [Your Goal].\n- Question to ask: "I read about the recent Series B funding. How does the company plan to allocate these resources towards its AI roadmap, particularly in [Area of Interest]?"\n**Key Competitors:**\n- Competitor X\n- Competitor Y\n*(Disclaimer: This is simulated research data.)*`;
+            companyResearchOutputText.innerHTML = marked.parse(sampleResearch.trim());
+            companyResearchOutputContainer.classList.remove('hidden');
+            companyResearchOutputContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        if (studioResumeInput && studioResumePreview) {
+            const updateResumePreview = () => {
+                studioResumePreview.innerHTML = studioResumeInput.innerHTML;
+            };
+            studioResumeInput.addEventListener('input', updateResumePreview);
+            // Initial render
+            updateResumePreview();
+        }
+        statusInput.addEventListener('change', function() {
+            if (statusInput.value === 'Interview') {
+                document.getElementById('substatusContainer').style.display = '';
+            } else {
+                document.getElementById('substatusContainer').style.display = 'none';
+                document.getElementById('substatus').value = '';
+            }
+        });
+        // Interview substatus tag color classes
+        function getSubstatusTagClass(substatus) {
+            switch (substatus) {
+                case 'Recruiter': return 'tag-teal';
+                case 'Screening': return 'tag-gray';
+                case 'Round 1': return 'tag-blue';
+                case 'Round 2': return 'tag-indigo';
+                case 'Round 3': return 'tag-purple';
+                case 'Round 4': return 'tag-pink';
+                case 'Round 5': return 'tag-red';
+                default: return 'tag-gray';
+            }
+        }
+        jobForm.addEventListener('change', function(e) {
+            // Show/hide referral from input
+            if (e.target && e.target.id === 'referralCheckbox') {
+                document.getElementById('referralFromContainer').style.display = e.target.checked ? '' : 'none';
+            }
+        });
+
+        // Add JS logic to enable/disable and open links
+        const openJobDescriptionLinkBtn = document.getElementById('openJobDescriptionLinkBtn');
+        const openResumeLinkBtn = document.getElementById('openResumeLinkBtn');
+        const openCoverLetterLinkBtn = document.getElementById('openCoverLetterLinkBtn');
+        function updateLinkButtons() {
+            openJobDescriptionLinkBtn.disabled = !jobDescriptionLinkInput.value.trim();
+            openResumeLinkBtn.disabled = !resumeLinkInput.value.trim();
+            openCoverLetterLinkBtn.disabled = !coverLetterLinkInput.value.trim();
+        }
+        if (jobDescriptionLinkInput) jobDescriptionLinkInput.addEventListener('input', updateLinkButtons);
+        if (resumeLinkInput) resumeLinkInput.addEventListener('input', updateLinkButtons);
+        if (coverLetterLinkInput) coverLetterLinkInput.addEventListener('input', updateLinkButtons);
+        if (openJobDescriptionLinkBtn) openJobDescriptionLinkBtn.addEventListener('click', function() {
+            const url = jobDescriptionLinkInput.value.trim();
+            if (url) window.open(url, '_blank');
+        });
+        if (openResumeLinkBtn) openResumeLinkBtn.addEventListener('click', function() {
+            const url = resumeLinkInput.value.trim();
+            if (url) window.open(url, '_blank');
+        });
+        if (openCoverLetterLinkBtn) openCoverLetterLinkBtn.addEventListener('click', function() {
+            const url = coverLetterLinkInput.value.trim();
+            if (url) window.open(url, '_blank');
+        });
+        // When opening the modal, update the buttons
+        if (typeof openJobModal === 'function') {
+            const origOpenJobModal = openJobModal;
+            openJobModal = function(jobData = null) {
+                origOpenJobModal(jobData);
+                updateLinkButtons();
+            }
+        }
+
+        // JS logic for saving, listing, viewing, and deleting company research
+        function getSavedCompanyResearch() {
+            return JSON.parse(localStorage.getItem('companyResearches') || '[]');
+        }
+        function saveCompanyResearchToStorage(arr) {
+            localStorage.setItem('companyResearches', JSON.stringify(arr));
+        }
+        function saveCurrentCompanyResearch() {
+            if (!currentCompanyResearchJobId) return;
+            const selectedJob = jobApplications.find(j => j.id === currentCompanyResearchJobId);
+            if (!selectedJob) return;
+            const content = companyResearchOutputText.innerHTML;
+            if (!content.trim()) return;
+            let arr = getSavedCompanyResearch();
+            // Remove existing for this job
+            arr = arr.filter(r => r.jobId !== selectedJob.id);
+            arr.unshift({
+                id: generateId(),
+                jobId: selectedJob.id,
+                company: selectedJob.company,
+                jobTitle: selectedJob.jobTitle,
+                date: new Date().toISOString(),
+                content
+            });
+            saveCompanyResearchToStorage(arr);
+            renderSavedCompanyResearchList();
+            alert('Company research saved!');
+            document.getElementById('saveCompanyResearchBtn').style.display = 'none';
+        }
+        function renderSavedCompanyResearchList() {
+            const section = document.getElementById('savedCompanyResearchSection');
+            const list = document.getElementById('savedCompanyResearchList');
+            const view = document.getElementById('savedCompanyResearchView');
+            const arr = getSavedCompanyResearch();
+            if (!list || !section) return;
+            list.innerHTML = '';
+            if (arr.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            section.style.display = '';
+            arr.forEach(r => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between py-2 px-2 border-b border-gray-600';
+                li.innerHTML = `<span class="font-medium">${r.company} - ${r.jobTitle} <span class='text-xs text-gray-400 ml-2'>${formatDate(r.date)}</span></span>` +
+                    `<span><button class="btn-secondary btn-xs mr-2" data-action="view">View</button><button class="btn-secondary btn-xs" data-action="delete">Delete</button></span>`;
+                li.querySelector('[data-action="view"]').onclick = () => {
+                    view.innerHTML = `<h4 class='mb-2 font-semibold text-blue-400'>${r.company} - ${r.jobTitle}</h4>` + r.content;
+                    view.classList.remove('hidden');
+                    view.scrollIntoView({behavior:'smooth',block:'nearest'});
+                };
+                li.querySelector('[data-action="delete"]').onclick = () => {
+                    if (confirm('Delete this saved research?')) {
+                        const newArr = arr.filter(x => x.id !== r.id);
+                        saveCompanyResearchToStorage(newArr);
+                        renderSavedCompanyResearchList();
+                        view.classList.add('hidden');
+                    }
+                };
+                list.appendChild(li);
+            });
+        }
+        // Show Save button after research is generated
+        if (companyResearchOutputContainer && document.getElementById('saveCompanyResearchBtn')) {
+            const saveBtn = document.getElementById('saveCompanyResearchBtn');
+            function maybeShowSaveBtn() {
+                if (companyResearchOutputContainer.classList.contains('hidden')) {
+                    saveBtn.style.display = 'none';
+                } else {
+                    saveBtn.style.display = '';
+                }
+            }
+            saveBtn.onclick = saveCurrentCompanyResearch;
+            // Show/hide on research output
+            const origHandleCompanyResearchGenerate = handleCompanyResearchGenerate;
+            handleCompanyResearchGenerate = async function() {
+                await origHandleCompanyResearchGenerate();
+                maybeShowSaveBtn();
+            };
+        }
+        // Auto-load saved research for selected job
+        if (companyResearchJobSelectDropdown) {
+            companyResearchJobSelectDropdown.addEventListener('change', function() {
+                const arr = getSavedCompanyResearch();
+                const jobId = this.value;
+                const found = arr.find(r => r.jobId === jobId);
+                if (found) {
+                    companyResearchOutputContainer.classList.remove('hidden');
+                    companyResearchOutputText.innerHTML = found.content;
+                    document.getElementById('saveCompanyResearchBtn').style.display = 'none';
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', renderSavedCompanyResearchList);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add demo company research if none exists
+            if (!getSavedCompanyResearch().length) {
+                const demo = {
+                    id: generateId(),
+                    jobId: 'demo-job-1',
+                    company: 'DemoTech Inc.',
+                    jobTitle: 'AI Product Manager',
+                    date: new Date().toISOString(),
+                    content: `<h4 class='mb-2 font-semibold text-blue-400'>DemoTech Inc. - AI Product Manager</h4><p><strong>Company Overview:</strong> DemoTech Inc. is a leading innovator in artificial intelligence and cloud solutions, serving Fortune 500 clients worldwide.</p><ul><li><strong>Core Products:</strong> AI-driven analytics, cloud infrastructure, and automation platforms.</li><li><strong>Leadership:</strong> CEO Jane Doe, CTO John Smith.</li><li><strong>Recent News:</strong> Raised $50M in Series C funding (May 2024).</li></ul><p><strong>Competitive Advantages:</strong> Proprietary ML models, strong enterprise partnerships, rapid product iteration.</p>`
+                };
+                saveCompanyResearchToStorage([demo]);
+            }
+            renderSavedCompanyResearchList();
+        });
+
+        if(studioCoverLetterInput && studioCoverLetterPreview) {
+            const updateCoverLetterPreview = () => {
+                studioCoverLetterPreview.innerHTML = studioCoverLetterInput.innerHTML;
+            };
+            studioCoverLetterInput.addEventListener('input', updateCoverLetterPreview);
+            // Initial render
+            updateCoverLetterPreview();
+        }
+        if(coverLetterTemplateDropdown) coverLetterTemplateDropdown.addEventListener('change', function() {
+            const id = this.value;
+            if(!id) return;
+            const t = getTemplates('coverLetter').find(t => t.id === id);
+            if(t) studioCoverLetterInput.innerHTML = t.content;
+            this.value = '';
+        });
+        if(saveCoverLetterAsTemplateBtn) saveCoverLetterAsTemplateBtn.onclick = function(e) {
+            e.preventDefault && e.preventDefault();
+            const coverLetterContent = studioCoverLetterInput.innerHTML.trim();
+            if (!coverLetterContent) {
+                alert('Please enter your cover letter content before saving as a template.');
+                return;
+            }
+            const name = prompt('Enter a name for this cover letter template:');
+            if (!name) return;
+            // Save to localStorage under 'coverLetterTemplates'
+            let arr = getTemplates('coverLetter');
+            arr.push({ id: generateId(), name, content: coverLetterContent });
+            saveTemplates('coverLetter', arr);
+            renderTemplateLists && renderTemplateLists();
+            renderTemplateDropdowns && renderTemplateDropdowns();
+            alert('Cover letter template saved!');
+        };
     </script>
 </body>
 </html>
